@@ -91,6 +91,12 @@ static const arg_t defn[] = {
     "no",
     "Use memory-mapped I/O for reading binary LM files"},
 
+  { "-loglevel",
+    ARG_STRING,
+    "INFO",
+    "Verbosity level for logging messages. Options: DEBUG, INFO, INFOCONT, WARN, ERROR, FATAL"
+  },
+
   { NULL, 0, NULL, NULL }
 };
 
@@ -120,6 +126,8 @@ main(int argc, char *argv[])
 	if (cmd_ln_boolean_r(config, "-help")) {
 	    usagemsg(argv[0]);
 	}
+
+    err_set_log_level(cmd_ln_str_r(config, "-loglevel"));
 
 	/* Create log math object. */
 	if ((lmath = logmath_init

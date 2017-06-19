@@ -690,7 +690,8 @@ cmd_ln_parse_r(cmd_ln_t *inout_cmdln, const arg_t * defn, int32 argc, char *argv
 
     /* If we use it from something except pocketsphinx, print current values */
     if (!cmd_ln_exists_r(cmdln, "-logfn") && err_get_logfp()) {
-	cmd_ln_print_values_r(cmdln, err_get_logfp(), defn);
+        if (err_get_log_level() <= ERR_INFO)
+            cmd_ln_print_values_r(cmdln, err_get_logfp(), defn);
     }
 
     hash_table_free(defidx);

@@ -55,6 +55,7 @@
 #include "sphinxbase/ckd_alloc.h"
 
 static FILE*  logfp = NULL;
+static err_lvl_t log_level;
 static int    logfp_disabled = FALSE;
 
 #if defined(__ANDROID__)
@@ -80,6 +81,9 @@ static void* err_user_data;
 void
 err_msg(err_lvl_t lvl, const char *path, long ln, const char *fmt, ...)
 {
+    if (lvl < log_level)
+        return;
+
     static const char *err_prefix[ERR_MAX] = {
         "DEBUG", "INFO", "INFOCONT", "WARN", "ERROR", "FATAL"
     };
@@ -111,6 +115,9 @@ err_msg(err_lvl_t lvl, const char *path, long ln, const char *fmt, ...)
 void
 err_msg_system(err_lvl_t lvl, const char *path, long ln, const char *fmt, ...)
 {
+    if (lvl < log_level)
+        return;
+
     static const char *err_prefix[ERR_MAX] = {
         "DEBUG", "INFO", "INFOCONT", "WARN", "ERROR", "FATAL"
     };
@@ -157,6 +164,9 @@ err_msg_system(err_lvl_t lvl, const char *path, long ln, const char *fmt, ...)
 void
 err_msg_system(err_lvl_t lvl, const char *path, long ln, const char *fmt, ...)
 {
+    if (lvl < log_level)
+        return;
+
     int local_errno = errno;
     
     static const char *err_prefix[ERR_MAX] = {
@@ -223,6 +233,9 @@ err_wince_cb(void *user_data, err_lvl_t lvl, const char *fmt, ...)
 void
 err_logfp_cb(void *user_data, err_lvl_t lvl, const char *fmt, ...)
 {
+    if (lvl < log_level)
+        return;
+
     va_list ap;
     FILE *fp = err_get_logfp();
 
@@ -279,4 +292,37 @@ err_set_callback(err_cb_f cb, void* user_data)
 {
     err_cb = cb;
     err_user_data= user_data;
+}
+
+err_lvl_t 
+err_get_lvl_from_str(const char *sval)
+{
+    static const char *err_prefix[ERR_MAX] = {
+        "DEBUG", "INFO", "INFOCONT", "WARN", "ERROR", "FATAL"
+    };
+
+    err_lvl_t result = ERR_DEBUG;
+
+    int i = 0;
+
+    for (i = 0; err_prefix[i] != NULL; ++i, ++result)
+        if (0 == strcmp_nocase(sval, err_prefix[i])) 
+            return result;
+
+    return -1;
+}
+
+void
+err_set_log_level(const char* level_str)
+{
+    err_lvl_t level = err_get_lvl_from_str(level_str);
+
+    if (level >= 0)
+        log_level = level;
+}
+
+err_lvl_t 
+err_get_log_level(void)
+{
+    return log_level;
 }

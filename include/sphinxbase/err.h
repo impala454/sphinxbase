@@ -124,13 +124,9 @@ extern "C" {
 #define E_INFO_NOFN(...)  err_msg(ERR_INFO, NULL, 0, __VA_ARGS__)
 
 /**
- * Debug is disabled by default
+ * Print debugging information to error log
  */
-#ifdef SPHINX_DEBUG
 #define E_DEBUG(...) err_msg(ERR_DEBUG, NULL, 0, __VA_ARGS__)
-#else
-#define E_DEBUG(...)
-#endif
 
 typedef enum err_e {
     ERR_DEBUG,
@@ -195,5 +191,21 @@ err_set_logfile(const char *path);
 #ifdef __cplusplus
 }
 #endif
+
+/**
+ * Set logging verbosity level.
+ *
+ * @param level_str Verbosity level to set
+ */
+SPHINXBASE_EXPORT
+void err_set_log_level(const char* level_str);
+
+/**
+ * Get logging verbosity level.
+ *
+ * @return current log level
+ */
+SPHINXBASE_EXPORT
+err_lvl_t err_get_log_level(void);
 
 #endif /* !_ERR_H */
